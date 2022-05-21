@@ -14,6 +14,7 @@ app.config["MYSQL_DB"] = "ybblog"
 app.config["MYSQL_CURSORCLASS"] = "DictCursor"#return queryset data as django quersets
 mysql = MySQL(app)
 
+#!Views
 @app.route('/')
 def indexView():
     context = {
