@@ -1,0 +1,20 @@
+{% extends "base/base.html" %}
+{% from "base/_formhelpers.html" import render_field %}
+
+{% block title %}
+{% endblock title %}
+
+{% block content %}
+    <!--  -->
+    <form action="/register" method="POST" class="form-group">
+        {{render_field(form.name,class="form-control")}}
+        {{render_field(form.username,class="form-control")}}
+        {{render_field(form.email,class="form-control")}}
+        {{render_field(form.password,class="form-control")}}
+        {{render_field(form.confirm,class="form-control")}}
+        <button type="submit" class="btn btn-primary btn-block font-weight-bold">Kayit Ol</button>
+    </form>
+{% endblock content %}
+
+{% block scripts %}
+{% endblock scripts %}
