@@ -26,6 +26,11 @@ class RegisterForm(Form):
     ])
     confirm = PasswordField('Parola Tekrar')
 
+#!LoginForm
+class LoginForm(Form):
+    username = StringField(label='Kullanici Adi')
+    password = PasswordField(label='Sifreniz')
+
 #!indexView
 @app.route('/')
 def indexView():
@@ -48,6 +53,7 @@ def aboutView():
 def detailView(id):
     return f"Detail Post Id - {id}"
 
+#!registerView
 @app.route('/register',methods=['GET','POST'])
 def registerView():
     form = RegisterForm(request.form)#form icindeki deyerleri getirir
@@ -62,10 +68,44 @@ def registerView():
         cursor.execute(query,(name,email,username,password))
         mysql.connection.commit()
         cursor.close()
-        flash('Başarıyla Kayıt Oldunuz...','success')
-        return redirect(url_for('indexView'))#yeni indexView adli funksiya isleyende hemin funksiyanin url ni getsin ele bil url_for o isi gorur
+        flash('Successfully Register...','success')
+        return redirect(url_for('loginView'))#yeni indexView adli funksiya isleyende hemin funksiyanin url ni getsin ele bil url_for o isi gorur
     else:
         return render_template('blogtemplates/register.html',form=form)
+
+@app.route('/login',methods=['GET','POST'])
+def loginView():
+    form = LoginForm(request.form)
+    if request.method == 'POST':
+        username_entered = form.username.data
+        password_entered = form.password.data
+        
+        cursor = mysql.connection.cursor()
+        qs = "SELECT * FROM users WHERE username=%s"
+        
+        result_qs = cursor.execute(qs,(username_entered,))#result returned object list lenght
+        print('Username Single or Username List')
+        #print(result_qs)
+        #print(cursor.fetchone())
+        
+        if result_qs>0:#if have data sql
+            data_qs = cursor.fetchone()
+            real_password = data_qs['password']
+            print('Real Password ',real_password)
+            print('Entered password ', password_entered)
+            if sha256_crypt.verify(password_entered,real_password):
+                flash('Successfully Logged...','success')
+                return redirect(url_for('indexView'))
+            else:
+                flash('Please Correct Password or Username','danger')
+                return redirect(url_for('loginView'))
+        else:#if not user found in database
+            flash('Not User Found In Database...','danger')
+            return redirect(url_for('loginView'))
+        
+        
+        
+    return render_template('blogtemplates/login.html',form=form)
 
 #!__name__ == '__main__'
 if __name__ == '__main__':
