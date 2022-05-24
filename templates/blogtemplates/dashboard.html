@@ -1,0 +1,13 @@
+{% extends "base/base.html" %}
+
+{% block title %} Dashboard {% endblock title %}
+
+{% block content %}
+    <h3>Welcome - <p class="d-inline text-secondary">{{session['username_in']}}</p></h3>
+    <hr>
+    <a href="/addarticle" class="btn btn-danger text-capitalize">add article</a>
+
+{% endblock content %}
+
+{% block scripts %}
+{% endblock scripts %}

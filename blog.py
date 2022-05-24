@@ -1,11 +1,23 @@
 from flask import Flask,render_template,flash,redirect,url_for,session,logging,request
 from flask_mysqldb import MySQL
 from wtforms import Form,StringField,TextAreaField,PasswordField,validators
+from functools import wraps
 from passlib.hash import sha256_crypt
 
 #!Create Flask Object
 app = Flask(__name__)
 app.secret_key = 'blogdsa3@*51!3#'
+
+#!login_required
+def login_required(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        if 'logged_in' in session:
+            return f(*args, **kwargs)
+        else:#if user not logged in
+            flash('This page not loading because you are not logged in site...','info')
+            return redirect(url_for('loginView'))
+    return decorated_function
 
 #!Connect Mysql and Xampp Server
 app.config["MYSQL_HOST"] = "localhost"
@@ -53,6 +65,12 @@ def aboutView():
 def detailView(id):
     return f"Detail Post Id - {id}"
 
+#!dashboardView
+@app.route('/dashboard')
+@login_required
+def dashboardView():
+    return render_template('blogtemplates/dashboard.html')
+
 #!registerView
 @app.route('/register',methods=['GET','POST'])
 def registerView():
@@ -73,6 +91,7 @@ def registerView():
     else:
         return render_template('blogtemplates/register.html',form=form)
 
+#!loginView
 @app.route('/login',methods=['GET','POST'])
 def loginView():
     form = LoginForm(request.form)
@@ -95,6 +114,8 @@ def loginView():
             print('Entered password ', password_entered)
             if sha256_crypt.verify(password_entered,real_password):
                 flash('Successfully Logged...','success')
+                session['logged_in'] = True
+                session['username_in'] = username_entered
                 return redirect(url_for('indexView'))
             else:
                 flash('Please Correct Password or Username','danger')
@@ -102,10 +123,13 @@ def loginView():
         else:#if not user found in database
             flash('Not User Found In Database...','danger')
             return redirect(url_for('loginView'))
-        
-        
-        
     return render_template('blogtemplates/login.html',form=form)
+
+#!logoutView
+@app.route('/logout')
+def logoutView():
+    session.clear()
+    return redirect(url_for('indexView'))
 
 #!__name__ == '__main__'
 if __name__ == '__main__':

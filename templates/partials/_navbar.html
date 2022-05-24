@@ -27,11 +27,20 @@
             </li>
         </ul>
         <ul class="navbar-nav ml-auto">
+            {% if session['logged_in'] %}
+                <li class="nav-item">
+                    <a href="/logout" class="nav-link">Logout</a>
+                </li>
+                <li class="nav-item">
+                    <a href="/dashboard" class="nav-link">Dashboard</a>
+                </li>
+            {% else %}
+                <li class="nav-item">
+                    <a href="/login" class="nav-link">Login</a>
+                </li>
+            {% endif %}
             <li class="nav-item">
                 <a href="/register" class="nav-link">Register</a>
-            </li>
-            <li class="nav-item">
-                <a href="/login" class="nav-link">Login</a>
             </li>
         </ul>   
     </div>
