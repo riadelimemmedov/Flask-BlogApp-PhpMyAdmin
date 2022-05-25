@@ -27,7 +27,7 @@ app.config["MYSQL_DB"] = "ybblog"
 app.config["MYSQL_CURSORCLASS"] = "DictCursor"#return queryset data as django quersets
 mysql = MySQL(app)
 
-#!Register Form
+#!RegisterForm
 class RegisterForm(Form):
     name = StringField(label='Isim Soyisim',validators=[validators.Length(min=4,max=25)])
     username = StringField(label='Kullanici Adi',validators=[validators.Length(min=5,max=35)])
@@ -38,6 +38,10 @@ class RegisterForm(Form):
     ])
     confirm = PasswordField('Parola Tekrar')
 
+#!ArticleForm
+class ArticleForm(Form):
+    title = StringField(label='Makale Basligi',validators=[validators.Length(min=5,max=100)])
+    content = TextAreaField(label='Makale Icerigi',validators=[validators.Length(min=10)])
 #!LoginForm
 class LoginForm(Form):
     username = StringField(label='Kullanici Adi')
@@ -70,6 +74,36 @@ def detailView(id):
 @login_required
 def dashboardView():
     return render_template('blogtemplates/dashboard.html')
+
+#!addArticle
+@app.route('/addarticle',methods=['GET','POST'])
+def addArticle():
+    form = ArticleForm(request.form)
+    if request.method == 'POST' and form.validate():
+        title = form.title.data
+        content = form.content.data
+        
+        cursor = mysql.connection.cursor()
+        qs = "INSERT INTO articles(title,author,content) VALUES(%s,%s,%s)"
+        cursor.execute(qs,(title,session['username_in'],content))
+        mysql.connection.commit()
+        cursor.close()
+        
+        flash('Makale Basariyla Eklendi','success')
+        return redirect(url_for('dashboardView'))
+    return render_template('blogtemplates/addarticle.html',form=form)
+
+@app.route('/articles')
+def articleListView():
+    cursor = mysql.connection.cursor()#yeni mysql connect ol cursoru baslat menasinda cagir cursor() funksiyasini ele bil
+    qs = "SELECT * FROM articles"
+    result = cursor.execute(qs)
+    
+    if result > 0:
+        articles = cursor.fetchall()
+        return render_template('blogtemplates/articles.html',articles=articles)
+    else:
+        return render_template('blogtemplates/articles.html')
 
 #!registerView
 @app.route('/register',methods=['GET','POST'])
