@@ -64,6 +64,7 @@ def aboutView():
     }
     return render_template('blogtemplates/about.html',context=context)
 
+#!articleDetailView
 @app.route('/article/detail/<int:id>')
 def articleDetailView(id):
     cursor = mysql.connection.cursor()
@@ -105,6 +106,22 @@ def addArticle():
         flash('Makale Basariyla Eklendi','success')
         return redirect(url_for('dashboardView'))
     return render_template('blogtemplates/addarticle.html',form=form)
+
+@app.route('/delete/<int:id>')
+@login_required
+def deleteArticle(id):
+    cursor = mysql.connection.cursor()
+    qs = "SELECT * FROM articles WHERE author=%s AND id=%s"
+    result = cursor.execute(qs,(session['username_in'],id))
+    if result > 0:
+        qs2 = "DELETE FROM articles WHERE id=%s"
+        cursor.execute(qs2,(id,))
+        mysql.connection.commit()
+        flash('Successfully Deleted Article')
+        return redirect(url_for('dashboardView'))
+    else:
+        flash('This article not found or not permissions deleted article')
+        return redirect(url_for('indexView'))
 
 @app.route('/articles')
 def articleListView():
