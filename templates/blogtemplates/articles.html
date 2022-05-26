@@ -6,7 +6,7 @@
     {% if articles %}
         <ul class="list-group">
             {% for article in articles %}
-                <li class="list-group-item">{{article.title}}</li>
+                <li class="list-group-item"><a href="/article/detail/{{article.id}}" class="text-decoration-none">{{article.title}}</a></li>
             {% endfor %}
         </ul>
     {% else %}

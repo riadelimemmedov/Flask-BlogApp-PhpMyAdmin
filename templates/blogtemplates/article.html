@@ -1,0 +1,19 @@
+{% extends "base/base.html" %}
+
+{% block title %} {% if article %} {{article.title}} {% else %} Article {% endif %} {% endblock title %}
+
+{% block content %}
+    {% if article %}
+        <h4>{{article.title}}</h4>
+        <hr>
+        Author : <span class="text-muted">{{article.author}}</span>
+        <hr>
+        Created Date : <span class="text-muted">{{article.created_date}}</span>
+        <hr>
+        {{article.content|safe}}
+    {% else %}
+        <div class="alert alert-warning">
+            <strong class="text-capitalize">Not Found Article</strong>
+        </div>
+    {% endif %}
+{% endblock content %}

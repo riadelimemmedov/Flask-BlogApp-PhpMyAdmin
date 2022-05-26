@@ -64,16 +64,29 @@ def aboutView():
     }
     return render_template('blogtemplates/about.html',context=context)
 
-#!detailView
-@app.route('/detail/<int:id>')
-def detailView(id):
-    return f"Detail Post Id - {id}"
+@app.route('/article/detail/<int:id>')
+def articleDetailView(id):
+    cursor = mysql.connection.cursor()
+    qs = "SELECT * FROM articles WHERE id=%s"# => %s yazilmasindaki sebeb sorgunu dynamic bir sekilde yazmag ucundur => %s ifadesi
+    result = cursor.execute(qs,(id,))
+    if result > 0:
+        article = cursor.fetchone()
+        return render_template('blogtemplates/article.html',article=article)
+    else:
+        return render_template('blogtemplates/article.html')
 
 #!dashboardView
 @app.route('/dashboard')
 @login_required
 def dashboardView():
-    return render_template('blogtemplates/dashboard.html')
+    cursor = mysql.connection.cursor()
+    qs  = "SELECT * FROM articles WHERE author=%s"
+    result = cursor.execute(qs,(session['username_in'],))
+    if result > 0:
+        articles = cursor.fetchall()
+        return render_template('blogtemplates/dashboard.html',articles=articles)
+    else:
+        return render_template('blogtemplates/dashboard.html')
 
 #!addArticle
 @app.route('/addarticle',methods=['GET','POST'])

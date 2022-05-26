@@ -6,7 +6,37 @@
     <h3>Welcome - <p class="d-inline text-secondary">{{session['username_in']}}</p></h3>
     <hr>
     <a href="/addarticle" class="btn btn-danger text-capitalize">add article</a>
-    
+    <br><br><br>
+
+    {% if articles %}
+        <table class="table table-hover text-center">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Title</th>
+                    <th scope="col">Author</th>
+                    <th scope="col">Created Date</th>
+                    <th scope="col"></th>
+                    <th scope="col"></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for article in articles %}
+                    <tr>
+                        <th scope="row">{{article.id}}</th>
+                        <td><a href="/article/detail/{{article.id}}" class="text-primary font-weight-bold">{{article.title}}</a></td>
+                        <td>{{article.author}}</td>
+                        <td>{{article.created_date}}</td>
+                        <td><a href="/edit/{{article.id}}" class="btn btn-outline-primary">Update</a></td>
+                        <td><a href="/delete/{{article.id}}" class="btn btn-outline-danger">Delete</a></td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+    {% endif %}
+
+
 {% endblock content %}
 
 {% block scripts %}
