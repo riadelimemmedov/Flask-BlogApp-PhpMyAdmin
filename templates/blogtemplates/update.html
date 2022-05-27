@@ -2,15 +2,15 @@
 {% from "base/_formhelpers.html" import render_field %}
 
 
-{% block title %} Add Article {% endblock title %}
+{% block title %} Update Article {% endblock title %}
 
 {% block content %}
-    <h3>Create Article</h3>
+    <h3>Update Article</h3>
     <hr>
-    <form action="/addarticle" method="POST" class="form-group">
+    <form method="POST" class="form-group">
         {{render_field(form.title,class="form-control")}}
         {{render_field(form.content,class="form-control")}}
-        <button type="submit" class="btn btn-danger">Create Article</button>
+        <button type="submit" class="btn btn-primary">Update Article</button>
     </form>
 {% endblock content %}
 

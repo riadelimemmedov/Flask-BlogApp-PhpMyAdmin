@@ -107,6 +107,7 @@ def addArticle():
         return redirect(url_for('dashboardView'))
     return render_template('blogtemplates/addarticle.html',form=form)
 
+#!deleteArticle
 @app.route('/delete/<int:id>')
 @login_required
 def deleteArticle(id):
@@ -120,9 +121,39 @@ def deleteArticle(id):
         flash('Successfully Deleted Article')
         return redirect(url_for('dashboardView'))
     else:
-        flash('This article not found or not permissions deleted article')
+        flash('This article not found or not permissions deleted article','danger')
         return redirect(url_for('indexView'))
 
+
+@app.route('/edit/<int:id>',methods=['GET','POST'])
+@login_required
+def updateArticle(id):
+    if request.method == 'GET':
+        cursor = mysql.connection.cursor()
+        qs_get_data = "SELECT * FROM articles WHERE author=%s AND id=%s"
+        result = cursor.execute(qs_get_data,(session['username_in'],id))
+        if result == 0:
+            flash('This article not found or not permissions updated')
+            return redirect(url_for('indexView'))
+        else:
+            article = cursor.fetchone()
+            form = ArticleForm()
+            form.title.data = article['title']
+            form.content.data = article['content']
+            return render_template('blogtemplates/update.html',form=form)
+    else:#if request.method == 'POST'
+        form = ArticleForm(request.form)
+        newTitle = form.title.data
+        newContent = form.content.data
+        
+        cursor = mysql.connection.cursor()
+        qs_update_data = "UPDATE articles SET title=%s,content=%s WHERE id=%s"
+        cursor.execute(qs_update_data,(newTitle,newContent,id))
+        mysql.connection.commit()
+        flash('Updated Article Successfully','success')
+        return redirect(url_for('dashboardView'))
+    
+#!articleListView
 @app.route('/articles')
 def articleListView():
     cursor = mysql.connection.cursor()#yeni mysql connect ol cursoru baslat menasinda cagir cursor() funksiyasini ele bil
