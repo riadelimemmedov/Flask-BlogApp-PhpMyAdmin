@@ -124,7 +124,7 @@ def deleteArticle(id):
         flash('This article not found or not permissions deleted article','danger')
         return redirect(url_for('indexView'))
 
-
+#!updateArticle
 @app.route('/edit/<int:id>',methods=['GET','POST'])
 @login_required
 def updateArticle(id):
@@ -152,7 +152,26 @@ def updateArticle(id):
         mysql.connection.commit()
         flash('Updated Article Successfully','success')
         return redirect(url_for('dashboardView'))
-    
+
+
+#!searchArticleView
+@app.route('/search',methods=['GET','POST'])
+def searchArticleView():
+    if request.method == 'GET':
+        return redirect(url_for('indexView'))
+    else:
+        keyword = request.form.get('keyword')
+        cursor = mysql.connection.cursor()
+        qs_search = "SELECT * FROM articles WHERE title LIKE '%{}%'".format(keyword)
+        print('Qs Search Value ', qs_search)
+        result = cursor.execute(qs_search)
+        if result == 0:
+            flash('Not found articles...','warning')
+            return redirect(url_for('articleListView'))
+        else:
+            articles = cursor.fetchall()
+            return render_template('blogtemplates/articles.html',articles=articles)
+        
 #!articleListView
 @app.route('/articles')
 def articleListView():
